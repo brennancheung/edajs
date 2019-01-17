@@ -1,4 +1,5 @@
 import React from 'react'
+import ExperimentsPage from 'components/pages/ExperimentsPage'
 import HomePage from 'components/pages/HomePage'
 import LoginPage from 'components/pages/LoginPage'
 import Navbar from 'components/Navbar'
@@ -12,6 +13,7 @@ const Main = ({ context }) => {
     <Navbar>
       <Switch>
         <Route path="/" exact component={HomePage} />
+        <Route path="/experiments" component={ExperimentsPage} />
         <Redirect to="/" />
       </Switch>
     </Navbar>
