@@ -1,10 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-const Grid = ({ opacity, tickSpacing, width, height }) => {
+const Grid = ({ opacity, minorTick, majorTick, width, height }) => {
   let gridLines = []
 
   const drawLine = (type, position) => {
+    let strokeOpacity = position % majorTick === 0 ? opacity * 2 : opacity
     if (type === 'horizontal') {
       return (
         <line
@@ -14,7 +15,7 @@ const Grid = ({ opacity, tickSpacing, width, height }) => {
           x2={width}
           y2={position}
           stroke="black"
-          strokeOpacity={opacity}
+          strokeOpacity={strokeOpacity}
         />
       )
     }
@@ -27,16 +28,16 @@ const Grid = ({ opacity, tickSpacing, width, height }) => {
           x2={position}
           y2={height}
           stroke="black"
-          strokeOpacity={opacity}
+          strokeOpacity={strokeOpacity}
         />
       )
     }
   }
 
-  for (let offset=0; offset <= width; offset += tickSpacing) {
+  for (let offset=0; offset <= width; offset += minorTick) {
     gridLines.push(drawLine('vertical', offset))
   }
-  for (let offset=0; offset <= height; offset += tickSpacing) {
+  for (let offset=0; offset <= height; offset += minorTick) {
     gridLines.push(drawLine('horizontal', offset))
   }
 
@@ -48,7 +49,8 @@ const Grid = ({ opacity, tickSpacing, width, height }) => {
 }
 
 Grid.propTypes = {
-  tickSpacing: PropTypes.number.isRequired,
+  minorTick: PropTypes.number.isRequired,
+  majorTick: PropTypes.number.isRequired,
   opacity: PropTypes.number,
   width: PropTypes.number.isRequired,
   height: PropTypes.number.isRequired,

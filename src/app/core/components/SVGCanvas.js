@@ -91,7 +91,7 @@ class SVGCanvas extends React.Component {
           onMouseMove={this.handleMouseMove}
           viewBox={[vbX, vbY, vbWidth, vbHeight].join(' ')}
         >
-          <Grid tickSpacing={10} width={width} height={height} />
+          <Grid minorTick={10} majorTick={50} width={width} height={height} />
           {children}
         </svg>
         <pre>{JSON.stringify(this.state, null, 4)}</pre>
