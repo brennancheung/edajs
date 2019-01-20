@@ -6,7 +6,12 @@ import { MuiThemeProvider, createMuiTheme } from '@material-ui/core'
 import './app.css'
 import Main from './Main'
 
-const initialContext = {}
+const initialContext = {
+  scale: 1.0,
+  zoom: 1.25,
+  offsetX: 0,
+  offsetY: 0,
+}
 
 const themeOptions = {
   typography: {
