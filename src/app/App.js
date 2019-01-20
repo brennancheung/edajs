@@ -1,5 +1,6 @@
 import React from 'react'
 import AppContext from 'core/AppContext'
+import HotKeys from 'core/HotKeys'
 import FirebaseContainer from 'core/FirebaseContainer'
 import { BrowserRouter as Router } from 'react-router-dom'
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core'
@@ -12,6 +13,7 @@ const initialContext = {
   canvasOffsetX: 0,
   canvasOffsetY: 0,
   cursor: 'pointer',
+  selectedTool: 'move',
 }
 
 const themeOptions = {
@@ -28,9 +30,11 @@ class App extends React.Component {
       <Router>
         <MuiThemeProvider theme={theme}>
           <AppContext initialContext={initialContext}>
-            <FirebaseContainer>
-              <Main />
-            </FirebaseContainer>
+            <HotKeys>
+              <FirebaseContainer>
+                <Main />
+              </FirebaseContainer>
+            </HotKeys>
           </AppContext>
         </MuiThemeProvider>
       </Router>

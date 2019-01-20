@@ -98,7 +98,7 @@ const styles = theme => ({
 })
 
 class Navbar extends React.Component {
-  state = { open: true }
+  state = { open: false }
 
   handleDrawerOpen = () => { this.setState({ open: true }) }
   handleDrawerClose = () => { this.setState({ open: false }) }

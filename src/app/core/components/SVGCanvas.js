@@ -113,7 +113,6 @@ class SVGCanvas extends React.Component {
           <Grid minorTick={10} majorTick={50} width={width} height={height} />
           {children}
         </svg>
-        <pre>{JSON.stringify(this.state, null, 4)}</pre>
       </React.Fragment>
     )
   }
