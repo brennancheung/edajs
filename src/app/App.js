@@ -11,6 +11,7 @@ const initialContext = {
   zoom: 1.25,
   offsetX: 0,
   offsetY: 0,
+  cursor: 'pointer',
 }
 
 const themeOptions = {

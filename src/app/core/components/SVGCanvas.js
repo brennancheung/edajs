@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import Grid from './Grid'
 import { compose } from 'ramda'
 import { withAppContext } from 'core/AppContext'
 import parseMouseEvent from 'core/helpers/parseMouseEvent'
@@ -8,7 +9,6 @@ class SVGCanvas extends React.Component {
   canvasRef = React.createRef()
   state = {
     dragging: false,
-    cursor: 'default',
   }
 
   getNumbers = e => {
@@ -22,7 +22,7 @@ class SVGCanvas extends React.Component {
     const canvasX = offsetX + (x / width) * (canvasRight - offsetX)
     const canvasY = offsetY + (y / height) * (canvasBottom - offsetY)
     const vars = { width, height, x, y, canvasRight, canvasBottom, canvasX, canvasY, offsetX, offsetY, scale, zoom }
-    this.setState({ vars })
+    this.setState({ ...vars })
     return vars
   }
 
@@ -38,18 +38,8 @@ class SVGCanvas extends React.Component {
   }
 
   handleMouseMove = e => {
-    const { context, setContext, width, height } = this.props
-    const { offsetX, offsetY, scale } = context
-    const rect = this.canvasRef.current.getBoundingClientRect()
-    const x = e.clientX - rect.left
-    const y = e.clientY - rect.top
-    const canvasRight = width / scale + offsetX
-    const canvasBottom = height / scale + offsetY
-    const canvasX = offsetX + (x / width) * (canvasRight - offsetX)
-    const canvasY = offsetY + (y / height) * (canvasBottom - offsetY)
-    this.setState({
-      x, y, canvasX, canvasY, canvasRight, canvasBottom
-    })
+    const { setContext } = this.props
+    const { offsetX, offsetY, canvasX, canvasY } = this.getNumbers(e)
     if (this.state.dragging) {
       const dx = canvasX - this.startX
       const dy = canvasY - this.startY
@@ -68,20 +58,21 @@ class SVGCanvas extends React.Component {
       this.startX = canvasX
       this.startY = canvasY
       this.setState({ dragging: true })
-      this.setState({ cursor: 'grabbing' })
+      this.props.setContext({ cursor: 'grabbing' })
     }
   }
 
   handleMouseUp = e => {
     const { buttons } = parseMouseEvent(e)
     if (!buttons.middle) {
-      this.setState({ dragging: false, cursor: 'default' })
+      this.setState({ dragging: false })
+      this.props.setContext({ cursor: 'default' })
     }
   }
 
   render () {
     const { children, context, width, height } = this.props
-    const { offsetX, offsetY, scale } = context
+    const { offsetX, offsetY, scale, cursor } = context
     const vbX = offsetX
     const vbY = offsetY
     const vbWidth = width / scale
@@ -93,13 +84,14 @@ class SVGCanvas extends React.Component {
           ref={this.canvasRef}
           width={width}
           height={height}
-          style={{ border: '1px solid #000', cursor: this.state.cursor }}
+          style={{ border: '1px solid #000', cursor }}
           onMouseDown={this.handleMouseDown}
           onMouseUp={this.handleMouseUp}
           onWheel={this.handleWheel}
           onMouseMove={this.handleMouseMove}
           viewBox={[vbX, vbY, vbWidth, vbHeight].join(' ')}
         >
+          <Grid tickSpacing={10} width={width} height={height} />
           {children}
         </svg>
         <pre>{JSON.stringify(this.state, null, 4)}</pre>

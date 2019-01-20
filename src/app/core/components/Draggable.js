@@ -7,7 +7,6 @@ class Draggable extends React.Component {
   state = {
     x: 0,
     y: 0,
-    cursor: 'pointer',
   }
 
   handleMouseDown = e => {
@@ -19,7 +18,7 @@ class Draggable extends React.Component {
 
     this.startX = e.clientX
     this.startY = e.clientY
-    this.setState({ cursor: 'move' })
+    this.props.setContext({ cursor: 'move' })
     document.addEventListener('mousemove', this.handleMouseMove)
   }
 
@@ -42,19 +41,18 @@ class Draggable extends React.Component {
   }
 
   handleMouseEnter = e => {
-    this.setState({ cursor: 'move' })
+    this.props.setContext({ cursor: 'move' })
   }
 
   handleMouseLeave = e => {
-    this.setState({ cursor: 'pointer' })
+    this.props.setContext({ cursor: 'default' })
   }
 
   render () {
     const { children } = this.props
-    const { cursor, x, y } = this.state
+    const { x, y } = this.state
     return (
       <g
-        style={{ cursor }}
         transform={`translate(${x}, ${y})`}
         onMouseDown={this.handleMouseDown}
         onMouseUp={this.handleMouseUp}
