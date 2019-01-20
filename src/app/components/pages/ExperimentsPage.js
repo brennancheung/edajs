@@ -7,7 +7,7 @@ class ExperimentsPage extends React.Component {
     return (
       <div>
         <h1>Experiments</h1>
-        <SVGCanvas>
+        <SVGCanvas width={800} height={800}>
           <Draggable onChange={this.handleDrag}>
             <g>
               <rect

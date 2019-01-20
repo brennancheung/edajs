@@ -13,40 +13,54 @@ class SVGCanvas extends React.Component {
 
   getNumbers = e => {
     const { context, width, height } = this.props
-    const { offsetX, offsetY, scale, zoom } = context
+    const { canvasOffsetX, canvasOffsetY, scale, zoom } = context
+
+    // The absolute x, y pixel offset from the top left of the canvas area
     const rect = this.canvasRef.current.getBoundingClientRect()
     const x = e.clientX - rect.left
     const y = e.clientY - rect.top
-    const canvasRight = width / scale + offsetX
-    const canvasBottom = height / scale + offsetY
-    const canvasX = offsetX + (x / width) * (canvasRight - offsetX)
-    const canvasY = offsetY + (y / height) * (canvasBottom - offsetY)
-    const vars = { width, height, x, y, canvasRight, canvasBottom, canvasX, canvasY, offsetX, offsetY, scale, zoom }
-    this.setState({ ...vars })
+
+    // Bottom right of the canvas in the canvas's own units (mm)
+    const canvasRight = width / scale + canvasOffsetX
+    const canvasBottom = height / scale + canvasOffsetY
+
+    // Dimensions of the canvas in canvas units (not pixels)
+    const canvasRangeX = canvasRight - canvasOffsetX
+    const canvasRangeY = canvasBottom - canvasOffsetY
+
+    // the normalized offset (0.0 to 1.0) of how far in the cursor is in the canvas area
+    const normOffsetX= x / width
+    const normOffsetY = y / height
+
+    // The cartesian coordinates of where the cursor is on the canvas (accounting for zoom and pan)
+    const canvasX = canvasOffsetX + normOffsetX * canvasRangeX
+    const canvasY = canvasOffsetY + normOffsetY * canvasRangeY
+
+    const vars = { width, height, x, y, canvasRight, canvasBottom, canvasX, canvasY, canvasOffsetX, canvasOffsetY, scale, zoom, normOffsetX, normOffsetY }
     return vars
   }
 
   handleWheel = e => {
-    const { canvasX, canvasY, offsetX, offsetY, scale, zoom } = this.getNumbers(e)
-    if (e.deltaY === 0) { return }
+    const { canvasX, canvasY, scale, zoom, normOffsetX, normOffsetY, width, height } = this.getNumbers(e)
+    if (e.deltaY === 0) { return } // We're only concerned with vertical scroll wheel events
     const zoomIn = e.deltaY > 0
     const newScale = zoomIn ? scale * zoom : scale / zoom
-    const newX = offsetX + (canvasX - offsetX) / 2.0 / scale
-    const newY = offsetY + (canvasY - offsetY) / 2.0 / scale
-    this.props.setContext({ scale: newScale, offsetX: newX, offsetY: newY })
-    this.setState({ newX, newY })
+    const newRangeX = width / newScale
+    const newRangeY = height / newScale
+    const canvasOffsetX = canvasX - newRangeX * normOffsetX
+    const canvasOffsetY = canvasY - newRangeY * normOffsetY
+    this.props.setContext({ scale: newScale, canvasOffsetX, canvasOffsetY })
   }
 
   handleMouseMove = e => {
     const { setContext } = this.props
-    const { offsetX, offsetY, canvasX, canvasY } = this.getNumbers(e)
+    const { canvasOffsetX, canvasOffsetY, canvasX, canvasY } = this.getNumbers(e)
     if (this.state.dragging) {
       const dx = canvasX - this.startX
       const dy = canvasY - this.startY
-      this.setState({ dx, dy })
       setContext({
-        offsetX: offsetX - dx,
-        offsetY: offsetY - dy
+        canvasOffsetX: canvasOffsetX - dx,
+        canvasOffsetY: canvasOffsetY - dy
       })
     }
   }
@@ -54,6 +68,7 @@ class SVGCanvas extends React.Component {
   handleMouseDown = e => {
     const { buttons } = parseMouseEvent(e)
     if (buttons.middle) {
+      // Start panning operation
       const { canvasX, canvasY } = this.getNumbers(e)
       this.startX = canvasX
       this.startY = canvasY
@@ -70,11 +85,14 @@ class SVGCanvas extends React.Component {
     }
   }
 
+  handleContextMenu = e => {
+    e.preventDefault()
+    e.stopPropagation()
+  }
+
   render () {
     const { children, context, width, height } = this.props
-    const { offsetX, offsetY, scale, cursor } = context
-    const vbX = offsetX
-    const vbY = offsetY
+    const { canvasOffsetX, canvasOffsetY, scale, cursor } = context
     const vbWidth = width / scale
     const vbHeight = height / scale
 
@@ -89,7 +107,8 @@ class SVGCanvas extends React.Component {
           onMouseUp={this.handleMouseUp}
           onWheel={this.handleWheel}
           onMouseMove={this.handleMouseMove}
-          viewBox={[vbX, vbY, vbWidth, vbHeight].join(' ')}
+          onContextMenu={this.handleContextMenu}
+          viewBox={[canvasOffsetX, canvasOffsetY, vbWidth, vbHeight].join(' ')}
         >
           <Grid minorTick={10} majorTick={50} width={width} height={height} />
           {children}

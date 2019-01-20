@@ -1,11 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-const Grid = ({ opacity, minorTick, majorTick, width, height }) => {
+const Grid = ({ opacity, minorTick, majorTick, width, height, majorOpacity, minorOpacity }) => {
   let gridLines = []
 
   const drawLine = (type, position) => {
-    let strokeOpacity = position % majorTick === 0 ? opacity * 2 : opacity
+    let strokeOpacity = position % majorTick === 0 ? majorOpacity : minorOpacity
     if (type === 'horizontal') {
       return (
         <line
@@ -54,11 +54,14 @@ Grid.propTypes = {
   opacity: PropTypes.number,
   width: PropTypes.number.isRequired,
   height: PropTypes.number.isRequired,
+  minorOpacity: PropTypes.number,
+  majorOpacity: PropTypes.number,
 }
 
 Grid.defaultProps = {
   tickSpacing: 10,
-  opacity: 0.1,
+  minorOpacity: 0.1,
+  majorOpacity: 0.5,
 }
 
 export default Grid

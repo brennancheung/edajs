@@ -9,8 +9,8 @@ import Main from './Main'
 const initialContext = {
   scale: 1.0,
   zoom: 1.25,
-  offsetX: 0,
-  offsetY: 0,
+  canvasOffsetX: 0,
+  canvasOffsetY: 0,
   cursor: 'pointer',
 }
 
