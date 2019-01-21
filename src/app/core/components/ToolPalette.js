@@ -49,7 +49,7 @@ class ToolPalette extends React.Component {
           Icon={DeleteIcon}
           tool="delete"
           text="delete"
-          hotkey="del"
+          hotkey="d"
         />
         <ToolButton
           Icon={LabelIcon}

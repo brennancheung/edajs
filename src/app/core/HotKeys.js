@@ -5,6 +5,7 @@ import { withAppContext } from 'core/AppContext'
 const keyMap = {
   ' ': 'move',
   'a': 'add',
+  'd': 'delete',
   'e': 'edit',
   'l': 'label',
   'm': 'measure',
@@ -13,6 +14,18 @@ const keyMap = {
   'v': 'move',
   'w': 'wire',
   'Delete': 'delete',
+}
+
+const cursorMap = {
+  add: 'crosshair',
+  delete: 'no-drop',
+  edit: 'pointer',
+  label: 'default',
+  measure: 'vertical-text',
+  select: 'default',
+  text: 'text',
+  move: 'grab',
+  wire: 'default',
 }
 
 class HotKeys extends React.Component {
@@ -35,19 +48,28 @@ class HotKeys extends React.Component {
     // Spacebar is a temporary tool.  It reverts back to previous tool.
     if (e.key === ' ') {
       this.setState({ previousTool: context.selectedTool })
+      setContext({ cursor: 'grab' })
     }
 
     const tool = keyMap[e.key]
     if (!tool) { return }
 
     setContext({ selectedTool: tool })
+    this.setCursor(tool)
   }
 
   handleKeyUp = e => {
     // Revert back to previous tool when spacebar is released.
     if (e.key === ' ' && this.state.previousTool) {
       this.props.setContext({ selectedTool: this.state.previousTool })
+      this.setCursor(this.state.previousTool)
     }
+  }
+
+  setCursor = tool => {
+    const cursor = cursorMap[tool]
+    if (!cursor) { return }
+    this.props.setContext({ cursor })
   }
 
   componentDidMount () {

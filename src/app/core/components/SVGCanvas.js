@@ -9,6 +9,7 @@ class SVGCanvas extends React.Component {
   canvasRef = React.createRef()
   state = {
     dragging: false,
+    previousCursor: null,
   }
 
   getNumbers = e => {
@@ -66,14 +67,16 @@ class SVGCanvas extends React.Component {
   }
 
   handleMouseDown = e => {
+    const { context: { selectedTool } } = this.props
+    this.setState({ previousCursor: context.cursor })
     const { buttons } = parseMouseEvent(e)
     if (buttons.middle) {
-      // Start panning operation
-      const { canvasX, canvasY } = this.getNumbers(e)
-      this.startX = canvasX
-      this.startY = canvasY
-      this.setState({ dragging: true })
-      this.props.setContext({ cursor: 'grabbing' })
+      this.startPan(e)
+    }
+    if (buttons.left) {
+      if (selectedTool === 'move') {
+        this.startPan(e)
+      }
     }
   }
 
@@ -81,13 +84,22 @@ class SVGCanvas extends React.Component {
     const { buttons } = parseMouseEvent(e)
     if (!buttons.middle) {
       this.setState({ dragging: false })
-      this.props.setContext({ cursor: 'default' })
+      this.props.setContext({ cursor: this.state.previousCursor })
     }
   }
 
   handleContextMenu = e => {
     e.preventDefault()
     e.stopPropagation()
+  }
+
+  startPan = (e) => {
+    // Start panning operation
+    const { canvasX, canvasY } = this.getNumbers(e)
+    this.startX = canvasX
+    this.startY = canvasY
+    this.setState({ dragging: true })
+    this.props.setContext({ cursor: 'grabbing' })
   }
 
   render () {
